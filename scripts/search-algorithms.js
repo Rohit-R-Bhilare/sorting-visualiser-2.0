@@ -2,64 +2,61 @@
 
 class searchAlgorithms {
   constructor(time) {
+    this.time = parseInt(600 / time);
+    this.container = document.querySelector(".array");
     this.boxes = document.querySelectorAll(".s-cell");
-    this.size = this.boxes.length;
-    this.time = time;
-    this.help = new Helper(this.time, []); // reuse helper for effects
   }
 
-  sleep = async () => new Promise((res) => setTimeout(res, this.time * 200));
+  sleep = async () => new Promise((res) => setTimeout(res, this.time));
 
-  // ------------------- LINEAR SEARCH -------------------
-  LinearSearch = async (target) => {
-    for (let i = 0; i < this.size; i++) {
-      await this.help.markBox(i);
+  async LinearSearch(target) {
+    for (let i = 0; i < this.boxes.length; i++) {
+      comparisons++;
+      document.getElementById("comparisons").innerText = comparisons;
+
+      this.boxes[i].classList.add("current");
       await this.sleep();
 
-      let value = Number(this.boxes[i].getAttribute("value"));
-      if (value === target) {
-        await this.help.doneBox(i);
+      if (parseInt(this.boxes[i].innerText) === target) {
+        this.boxes[i].classList.remove("current");
+        this.boxes[i].classList.add("done");
         return i;
+      } else {
+        this.boxes[i].classList.remove("current");
+        this.boxes[i].classList.add("fail");
       }
-
-      await this.help.failBox(i);
-      await this.help.unmarkBox(i);
     }
-    alert("Element not found!");
     return -1;
-  };
+  }
 
-  // ------------------- BINARY SEARCH -------------------
-  BinarySearch = async (target) => {
-    let left = 0,
-      right = this.size - 1;
+  async BinarySearch(target) {
+    let low = 0, high = this.boxes.length - 1;
+    while (low <= high) {
+      let mid = Math.floor((low + high) / 2);
 
-    while (left <= right) {
-      let mid = Math.floor((left + right) / 2);
-      await this.help.markBox(mid);
+      comparisons++;
+      document.getElementById("comparisons").innerText = comparisons;
+
+      this.boxes[mid].classList.add("current");
       await this.sleep();
 
-      let value = Number(this.boxes[mid].getAttribute("value"));
-
-      if (value === target) {
-        await this.help.doneBox(mid);
+      let val = parseInt(this.boxes[mid].innerText);
+      if (val === target) {
+        this.boxes[mid].classList.remove("current");
+        this.boxes[mid].classList.add("done");
         return mid;
-      }
-
-      if (value < target) {
-        // fade left half
-        await this.help.fadeLeft(mid + 1);
-        left = mid + 1;
+      } else if (val < target) {
+        this.boxes[mid].classList.remove("current");
+        this.boxes[mid].classList.add("fail");
+        for (let i = low; i <= mid; i++) this.boxes[i].classList.add("fade");
+        low = mid + 1;
       } else {
-        // fade right half
-        await this.help.fadeRight(mid);
-        right = mid - 1;
+        this.boxes[mid].classList.remove("current");
+        this.boxes[mid].classList.add("fail");
+        for (let i = mid; i <= high; i++) this.boxes[i].classList.add("fade");
+        high = mid - 1;
       }
-
-      await this.help.unmarkBox(mid);
     }
-
-    alert("Element not found!");
     return -1;
-  };
+  }
 }
