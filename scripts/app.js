@@ -4,6 +4,7 @@
 const start = async () => {
   let algoValue = Number(document.querySelector(".algo-menu").value);
   let speedValue = Number(document.querySelector(".speed-menu").value);
+  let targetValue = Number(document.querySelector("#targetInput").value);
 
   if (speedValue === 0) speedValue = 1;
   if (algoValue === 0) {
@@ -15,33 +16,39 @@ const start = async () => {
   let searchAlgo = new searchAlgorithms(speedValue);
   let recursion = new recursionVisualizer(speedValue);
 
-  // ---------------- Sorting ----------------
+  // -------- Sorting --------
   if (algoValue === 1) await algorithm.BubbleSort();
   if (algoValue === 2) await algorithm.SelectionSort();
   if (algoValue === 3) await algorithm.InsertionSort();
   if (algoValue === 4) await algorithm.MergeSort();
   if (algoValue === 5) await algorithm.QuickSort();
 
-  // ---------------- Searching ----------------
+  // -------- Searching --------
   if (algoValue === 6) {
-    let target = prompt("Enter element to search:");
-    if (target !== null) {
-      await searchAlgo.LinearSearch(Number(target));
+    if (!targetValue && targetValue !== 0) {
+      alert("Please enter a target value to search.");
+      return;
     }
+    await searchAlgo.LinearSearch(targetValue);
   }
   if (algoValue === 7) {
-    let target = prompt("Enter element to search:");
-    if (target !== null) {
-      // Binary Search works on sorted array
-      await algorithm.QuickSort(); // sort first
-      await searchAlgo.BinarySearch(Number(target));
+    if (!targetValue && targetValue !== 0) {
+      alert("Please enter a target value to search.");
+      return;
     }
+    await algorithm.QuickSort(); // sort first
+    await searchAlgo.BinarySearch(targetValue);
   }
 
-  // ---------------- Recursion ----------------
+  // -------- Recursion --------
   if (algoValue === 8) {
     await clearScreen();
-    await recursion.factorial(5); // demo factorial(5)
+    let sizeValue = Number(document.querySelector(".size-menu").value);
+    if (sizeValue === 0) {
+      alert("Please choose recursion depth (array size dropdown).");
+      return;
+    }
+    await recursion.factorial(sizeValue); // recursion from N → 1
   }
 };
 
@@ -57,6 +64,7 @@ const RenderList = async () => {
   let list = await randomList(sizeValue);
   const arrayNode = document.querySelector(".array");
 
+  // Render as bars (default)
   for (const element of list) {
     const node = document.createElement("div");
     node.className = "cell";
@@ -64,25 +72,17 @@ const RenderList = async () => {
     node.style.height = `${3.8 * element}px`;
     arrayNode.appendChild(node);
   }
-};
 
-const RenderArray = async (sorted) => {
-  let sizeValue = Number(document.querySelector(".size-menu").value);
-  await clearScreen();
-
-  let list = await randomList(sizeValue);
-  if (sorted) list.sort((a, b) => a - b);
-
-  const arrayNode = document.querySelector(".array");
+  // Also render as boxes for searching
   const divnode = document.createElement("div");
   divnode.className = "s-array";
-
-  for (const element of list) {
+  list.forEach((element) => {
     const dnode = document.createElement("div");
     dnode.className = "s-cell";
     dnode.innerText = element;
+    dnode.setAttribute("value", element);
     divnode.appendChild(dnode);
-  }
+  });
   arrayNode.appendChild(divnode);
 };
 
@@ -118,5 +118,18 @@ const response = () => {
 document.querySelector(".icon").addEventListener("click", response);
 document.querySelector(".start").addEventListener("click", start);
 document.querySelector(".size-menu").addEventListener("change", RenderScreen);
-document.querySelector(".algo-menu").addEventListener("change", RenderScreen);
+
+// Toggle target input visibility based on algorithm type
+document.querySelector(".algo-menu").addEventListener("change", () => {
+  let algoValue = Number(document.querySelector(".algo-menu").value);
+  let targetInput = document.querySelector("#targetInput");
+  if (algoValue === 6 || algoValue === 7) {
+    targetInput.style.display = "inline-block";
+  } else {
+    targetInput.style.display = "none";
+    targetInput.value = "";
+  }
+  RenderScreen();
+});
+
 window.onload = RenderScreen;
