@@ -1,62 +1,71 @@
-"use strict";
+// ===== Linear Search =====
+async function linearSearch(arr, target, speed) {
+  const boxes = document.querySelectorAll(".s-cell");
 
-class searchAlgorithms {
-  constructor(time) {
-    this.time = parseInt(600 / time);
-    this.container = document.querySelector(".array");
-    this.boxes = document.querySelectorAll(".s-cell");
-  }
+  for (let i = 0; i < arr.length; i++) {
+    incrementComparisons();
 
-  sleep = async () => new Promise((res) => setTimeout(res, this.time));
+    highlight(boxes[i], "current");
+    await sleep(500 / speed);
 
-  async LinearSearch(target) {
-    for (let i = 0; i < this.boxes.length; i++) {
-      comparisons++;
-      document.getElementById("comparisons").innerText = comparisons;
-
-      this.boxes[i].classList.add("current");
-      await this.sleep();
-
-      if (parseInt(this.boxes[i].innerText) === target) {
-        this.boxes[i].classList.remove("current");
-        this.boxes[i].classList.add("done");
-        return i;
-      } else {
-        this.boxes[i].classList.remove("current");
-        this.boxes[i].classList.add("fail");
-      }
+    if (arr[i] === target) {
+      boxes[i].classList.remove("current");
+      highlight(boxes[i], "done");
+      return; // ✅ Stop immediately when found
+    } else {
+      boxes[i].classList.remove("current");
+      highlight(boxes[i], "fail");
     }
-    return -1;
   }
 
-  async BinarySearch(target) {
-    let low = 0, high = this.boxes.length - 1;
-    while (low <= high) {
-      let mid = Math.floor((low + high) / 2);
+  // If not found
+  const msg = document.createElement("div");
+  msg.classList.add("recursion");
+  msg.style.background = "#ef4444";
+  msg.style.color = "white";
+  msg.textContent = `Target ${target} not found`;
+  document.querySelector(".array").appendChild(msg);
+}
 
-      comparisons++;
-      document.getElementById("comparisons").innerText = comparisons;
+// ===== Binary Search =====
+async function binarySearch(arr, target, speed) {
+  let left = 0;
+  let right = arr.length - 1;
+  const boxes = document.querySelectorAll(".s-cell");
 
-      this.boxes[mid].classList.add("current");
-      await this.sleep();
+  while (left <= right) {
+    incrementComparisons();
+    let mid = Math.floor((left + right) / 2);
 
-      let val = parseInt(this.boxes[mid].innerText);
-      if (val === target) {
-        this.boxes[mid].classList.remove("current");
-        this.boxes[mid].classList.add("done");
-        return mid;
-      } else if (val < target) {
-        this.boxes[mid].classList.remove("current");
-        this.boxes[mid].classList.add("fail");
-        for (let i = low; i <= mid; i++) this.boxes[i].classList.add("fade");
-        low = mid + 1;
-      } else {
-        this.boxes[mid].classList.remove("current");
-        this.boxes[mid].classList.add("fail");
-        for (let i = mid; i <= high; i++) this.boxes[i].classList.add("fade");
-        high = mid - 1;
-      }
+    highlight(boxes[mid], "current");
+    await sleep(500 / speed);
+
+    if (arr[mid] === target) {
+      boxes[mid].classList.remove("current");
+      highlight(boxes[mid], "done");
+      return; // ✅ Stop immediately when found
+    } else if (arr[mid] < target) {
+      boxes[mid].classList.remove("current");
+      highlight(boxes[mid], "fail");
+
+      // Fade out left side
+      for (let i = left; i <= mid; i++) boxes[i].classList.add("fade");
+      left = mid + 1;
+    } else {
+      boxes[mid].classList.remove("current");
+      highlight(boxes[mid], "fail");
+
+      // Fade out right side
+      for (let i = mid; i <= right; i++) boxes[i].classList.add("fade");
+      right = mid - 1;
     }
-    return -1;
   }
+
+  // If not found
+  const msg = document.createElement("div");
+  msg.classList.add("recursion");
+  msg.style.background = "#ef4444";
+  msg.style.color = "white";
+  msg.textContent = `Target ${target} not found`;
+  document.querySelector(".array").appendChild(msg);
 }

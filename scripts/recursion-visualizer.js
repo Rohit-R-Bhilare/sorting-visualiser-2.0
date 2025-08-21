@@ -1,32 +1,53 @@
-"use strict";
+// ===== Recursion Visualizer =====
+// Factorial using Recursion with Visualization
 
-class recursionVisualizer {
-  constructor(time) {
-    this.time = parseInt(600 / time);
-    this.container = document.querySelector(".array");
+function runFactorial(n) {
+  const container = document.querySelector(".array");
+  container.innerHTML = "";
+  incrementRecCalls(); // initial call
+
+  const result = factorialVisualizer(n, container, 0);
+
+  // Show final result at the bottom
+  const finalBox = document.createElement("div");
+  finalBox.classList.add("recursion");
+  finalBox.style.background = "#10b981";
+  finalBox.style.color = "white";
+  finalBox.textContent = `Final Result: ${n}! = ${result}`;
+  container.appendChild(finalBox);
+}
+
+// Recursive factorial with step-by-step visualization
+function factorialVisualizer(n, container, depth) {
+  incrementRecCalls();
+
+  const step = document.createElement("div");
+  step.classList.add("recursion");
+  step.style.marginLeft = depth * 20 + "px";
+  step.textContent = `factorial(${n}) called`;
+  container.appendChild(step);
+
+  // Base case
+  if (n === 0 || n === 1) {
+    const base = document.createElement("div");
+    base.classList.add("recursion");
+    base.style.marginLeft = (depth + 1) * 20 + "px";
+    base.style.background = "#f59e0b";
+    base.textContent = `return 1`;
+    container.appendChild(base);
+    return 1;
   }
 
-  sleep = async () => new Promise((res) => setTimeout(res, this.time));
+  // Recursive call
+  const result = n * factorialVisualizer(n - 1, container, depth + 1);
 
-  async factorial(n, depth = 0) {
-    recCalls++;
-    document.getElementById("recCalls").innerText = recCalls;
+  const returnBox = document.createElement("div");
+  returnBox.classList.add("recursion");
+  returnBox.style.marginLeft = depth * 20 + "px";
+  returnBox.style.background = "#3b82f6";
+  returnBox.style.color = "white";
+  returnBox.textContent = `return ${n} * factorial(${n - 1}) = ${result}`;
+  container.appendChild(returnBox);
 
-    let node = document.createElement("div");
-    node.className = "s-cell recursion";
-    node.style.marginLeft = `${depth * 30}px`;
-    node.innerText = `factorial(${n})`;
-    this.container.appendChild(node);
-
-    await this.sleep();
-
-    if (n === 1) {
-      node.innerText += " = 1";
-      return 1;
-    }
-
-    let result = n * (await this.factorial(n - 1, depth + 1));
-    node.innerText += ` = ${result}`;
-    return result;
-  }
+  return result;
 }

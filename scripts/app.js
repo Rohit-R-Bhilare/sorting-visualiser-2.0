@@ -1,98 +1,152 @@
-"use strict";
+// === Selectors ===
+const algoMenu = document.querySelector(".algo-menu");
+const sizeMenu = document.querySelector(".size-menu");
+const speedMenu = document.querySelector(".speed-menu");
+const startBtn = document.querySelector(".start");
+const resetBtn = document.querySelector(".reset");
+const targetInput = document.getElementById("targetInput");
+const recursionInput = document.getElementById("recursionInput");
 
-// Globals for metrics
-let comparisons = 0;
-let swaps = 0;
-let recCalls = 0;
+const sizeGroup = document.getElementById("sizeGroup");
+const speedGroup = document.getElementById("speedGroup");
+const targetGroup = document.getElementById("targetGroup");
+const recursionInputGroup = document.getElementById("recursionInputGroup");
 
-// Reset metrics display
-function resetMetrics() {
-  comparisons = 0;
-  swaps = 0;
-  recCalls = 0;
-  document.getElementById("comparisons").innerText = 0;
-  document.getElementById("swaps").innerText = 0;
-  document.getElementById("recCalls").innerText = 0;
-  document.getElementById("timeTaken").innerText = 0;
-}
+const arrayContainer = document.querySelector(".array");
 
-// Array generator
-function generateArray(size) {
-  const container = document.querySelector(".array");
-  container.innerHTML = "";
+// === Handle Dynamic Dashboard ===
+algoMenu.addEventListener("change", () => {
+  const algo = parseInt(algoMenu.value);
 
-  for (let i = 0; i < size; i++) {
-    let value = Math.floor(Math.random() * 50) + 1;
+  // Hide all groups initially
+  sizeGroup.style.display = "none";
+  speedGroup.style.display = "none";
+  targetGroup.style.display = "none";
+  recursionInputGroup.style.display = "none";
 
-    // bar (cell)
-    let bar = document.createElement("div");
-    bar.className = "cell";
-    bar.style.height = `${3.5 * value}px`;
-    bar.setAttribute("value", value);
-
-    // box (s-cell)
-    let box = document.createElement("div");
-    box.className = "s-cell";
-    box.innerText = value;
-
-    container.appendChild(bar);
-    container.appendChild(box);
+  if (algo >= 1 && algo <= 5) {
+    // Sorting
+    sizeGroup.style.display = "block";
+    speedGroup.style.display = "block";
+  } else if (algo === 6 || algo === 7) {
+    // Searching
+    sizeGroup.style.display = "block";
+    speedGroup.style.display = "block";
+    targetGroup.style.display = "block";
+  } else if (algo === 8) {
+    // Recursion
+    recursionInputGroup.style.display = "block";
   }
-}
+});
 
-// Start button
-document.querySelector(".start").addEventListener("click", async () => {
-  const algoChoice = document.querySelector(".algo-menu").value;
-  const size = document.querySelector(".size-menu").value;
-  const speed = document.querySelector(".speed-menu").value;
-  const target = document.getElementById("targetInput").value;
-
-  if (algoChoice == 0 || size == 0) {
-    alert("Please select algorithm and array size!");
-    return;
-  }
+// === Start Button ===
+startBtn.addEventListener("click", async () => {
+  const algo = parseInt(algoMenu.value);
+  const size = parseInt(sizeMenu.value);
+  const speed = parseInt(speedMenu.value);
+  const target = parseInt(targetInput.value);
+  const n = parseInt(recursionInput.value);
 
   resetMetrics();
-  generateArray(size);
+  arrayContainer.innerHTML = "";
 
-  const bars = document.querySelectorAll(".cell");
-  const startTime = performance.now();
+  if (algo >= 1 && algo <= 5) {
+    // ===== Sorting =====
+    if (!size || !speed) return alert("Please select size and speed");
+    let arr = generateArray(size);
 
-  if (algoChoice >= 1 && algoChoice <= 5) {
-    let sorter = new sortAlgorithms(speed);
-    if (algoChoice == 1) await sorter.BubbleSort();
-    else if (algoChoice == 2) await sorter.SelectionSort();
-    else if (algoChoice == 3) await sorter.InsertionSort();
-    else if (algoChoice == 4) await sorter.MergeSort();
-    else if (algoChoice == 5) await sorter.QuickSort();
-  } else if (algoChoice == 6 || algoChoice == 7) {
-    if (target === "") {
-      alert("Please enter a target value for searching!");
-      return;
+    const startTime = performance.now();
+    if (algo === 1) await bubbleSort(arr, speed);
+    else if (algo === 2) await selectionSort(arr, speed);
+    else if (algo === 3) await insertionSort(arr, speed);
+    else if (algo === 4) await mergeSort(arr, 0, arr.length - 1, speed);
+    else if (algo === 5) await quickSort(arr, 0, arr.length - 1, speed);
+
+    updateMetrics("timeTaken", Math.round(performance.now() - startTime));
+
+  } else if (algo === 6 || algo === 7) {
+    // ===== Searching =====
+    if (!size || !speed || isNaN(target)) return alert("Enter size, speed, and target");
+    let arr = generateBoxes(size);
+
+    if (algo === 7) {
+      arr.sort((a, b) => a - b);
+      updateBoxes(arr);
     }
-    let searcher = new searchAlgorithms(speed);
-    if (algoChoice == 6) await searcher.LinearSearch(parseInt(target));
-    else await searcher.BinarySearch(parseInt(target));
-  } else if (algoChoice == 8) {
-    let rec = new recursionVisualizer(speed);
-    recCalls = 0;
-    await rec.factorial(size);
-  }
 
-  const endTime = performance.now();
-  document.getElementById("timeTaken").innerText = (endTime - startTime).toFixed(2);
-});
+    const startTime = performance.now();
+    if (algo === 6) await linearSearch(arr, target, speed);
+    else await binarySearch(arr, target, speed);
 
-// Reset button
-document.querySelector(".reset").addEventListener("click", () => {
-  const size = document.querySelector(".size-menu").value;
-  if (size > 0) {
-    generateArray(size);
-    resetMetrics();
+    updateMetrics("timeTaken", Math.round(performance.now() - startTime));
+
+  } else if (algo === 8) {
+    // ===== Recursion =====
+    if (!n) return alert("Enter a number for factorial");
+
+    const startTime = performance.now();
+    runFactorial(n);
+    updateMetrics("timeTaken", Math.round(performance.now() - startTime));
+  } else {
+    alert("Please select an algorithm");
   }
 });
 
-// Dark mode toggle
+// === Reset Button ===
+resetBtn.addEventListener("click", () => {
+  arrayContainer.innerHTML = "";
+  resetMetrics();
+  targetInput.value = "";
+  recursionInput.value = "";
+});
+
+// === Dark Mode Toggle ===
 document.querySelector(".dark-toggle").addEventListener("click", () => {
   document.body.classList.toggle("dark-mode");
 });
+
+// === Helper Generators ===
+
+// Generate array bars for sorting
+function generateArray(size) {
+  arrayContainer.innerHTML = "";
+  const arr = [];
+  for (let i = 0; i < size; i++) {
+    arr.push(Math.floor(Math.random() * 100) + 1);
+  }
+  arr.forEach(val => {
+    const bar = document.createElement("div");
+    bar.classList.add("cell");
+    bar.style.height = val * 3 + "px";
+    bar.textContent = val;
+    arrayContainer.appendChild(bar);
+  });
+  return arr;
+}
+
+// Generate boxes for searching
+function generateBoxes(size) {
+  arrayContainer.innerHTML = "";
+  const arr = [];
+  for (let i = 0; i < size; i++) {
+    arr.push(Math.floor(Math.random() * 50) + 1);
+  }
+  arr.forEach(val => {
+    const box = document.createElement("div");
+    box.classList.add("s-cell");
+    box.textContent = val;
+    arrayContainer.appendChild(box);
+  });
+  return arr;
+}
+
+// Update boxes after sorting (binary search)
+function updateBoxes(arr) {
+  arrayContainer.innerHTML = "";
+  arr.forEach(val => {
+    const box = document.createElement("div");
+    box.classList.add("s-cell");
+    box.textContent = val;
+    arrayContainer.appendChild(box);
+  });
+}

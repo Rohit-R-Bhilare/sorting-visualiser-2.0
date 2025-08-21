@@ -1,47 +1,68 @@
-"use strict";
+// ===== Delay Utility =====
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
-class Helper {
-  constructor(time, list) {
-    this.time = parseInt(600 / time);
-    this.list = list;
-  }
+// ===== Metrics =====
+let comparisons = 0;
+let swaps = 0;
+let recCalls = 0;
 
-  pause = async () => new Promise((res) => setTimeout(res, this.time));
+function resetMetrics() {
+  comparisons = 0;
+  swaps = 0;
+  recCalls = 0;
+  updateMetrics("comparisons", comparisons);
+  updateMetrics("swaps", swaps);
+  updateMetrics("recCalls", recCalls);
+  updateMetrics("timeTaken", 0);
+}
 
-  async swap(i, j) {
-    swaps++;
-    document.getElementById("swaps").innerText = swaps;
+function updateMetrics(type, value) {
+  document.getElementById(type).textContent = value;
+}
 
-    let ivalue = this.list[i].getAttribute("value");
-    let jvalue = this.list[j].getAttribute("value");
+function incrementComparisons() {
+  comparisons++;
+  updateMetrics("comparisons", comparisons);
+}
 
-    this.list[i].setAttribute("value", jvalue);
-    this.list[j].setAttribute("value", ivalue);
+function incrementSwaps() {
+  swaps++;
+  updateMetrics("swaps", swaps);
+}
 
-    this.list[i].style.height = `${3.5 * jvalue}px`;
-    this.list[j].style.height = `${3.5 * ivalue}px`;
+function incrementRecCalls() {
+  recCalls++;
+  updateMetrics("recCalls", recCalls);
+}
 
-    await this.pause();
-  }
+// ===== Highlighting (for visualization) =====
+function highlight(element, className) {
+  if (element) element.classList.add(className);
+}
 
-  async compare(i, j) {
-    comparisons++;
-    document.getElementById("comparisons").innerText = comparisons;
+function unhighlight(element, className) {
+  if (element) element.classList.remove(className);
+}
 
-    let ivalue = Number(this.list[i].getAttribute("value"));
-    let jvalue = Number(this.list[j].getAttribute("value"));
-    return ivalue > jvalue;
-  }
+// ===== Swap for Sorting =====
+async function swap(bar1, bar2, speed) {
+  incrementSwaps();
+  highlight(bar1, "current");
+  highlight(bar2, "current");
 
-  async mark(i) {
-    this.list[i].setAttribute("class", "cell current");
-    await this.pause();
-  }
-  async unmark(i) {
-    this.list[i].setAttribute("class", "cell");
-  }
-  async markSpl(i) {
-    this.list[i].setAttribute("class", "cell special");
-    await this.pause();
-  }
+  await sleep(500 / speed);
+
+  let tempHeight = bar1.style.height;
+  let tempText = bar1.textContent;
+
+  bar1.style.height = bar2.style.height;
+  bar1.textContent = bar2.textContent;
+
+  bar2.style.height = tempHeight;
+  bar2.textContent = tempText;
+
+  unhighlight(bar1, "current");
+  unhighlight(bar2, "current");
 }
