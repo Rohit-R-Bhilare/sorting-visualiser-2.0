@@ -1,102 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Algorithm Visualizer</title>
-  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/style.css" />
 </head>
 <body>
-
-  <!-- Navbar -->
-  <div class="navbar">
-    <h1>Algorithm Visualizer</h1>
+  <!-- === Header === -->
+  <header>
+    <h1>🚀 Algorithm Visualizer</h1>
     <button class="dark-toggle">🌙</button>
-  </div>
+  </header>
 
-  <!-- Layout -->
-  <div class="container">
+  <!-- === Dashboard Cards === -->
+  <section class="dashboard">
+    <div class="algo-card" id="sortingCard">🟦 Sorting</div>
+    <div class="algo-card" id="searchingCard">🟩 Searching</div>
+    <div class="algo-card" id="recursionCard">🟨 Recursion</div>
+  </section>
 
-    <!-- Dashboard -->
-    <div class="controls">
-      <h2>Dashboard</h2>
+  <!-- === Expanded Options (Dynamic) === -->
+  <section class="options-panel" id="optionsPanel"></section>
 
-      <!-- Algorithm -->
-      <label for="algoMenu">Algorithm</label>
-      <select class="algo-menu" id="algoMenu">
-        <option value="0">Select Algorithm</option>
-        <optgroup label="Sorting">
-          <option value="1">Bubble Sort</option>
-          <option value="2">Selection Sort</option>
-          <option value="3">Insertion Sort</option>
-          <option value="4">Merge Sort</option>
-          <option value="5">Quick Sort</option>
-        </optgroup>
-        <optgroup label="Searching">
-          <option value="6">Linear Search</option>
-          <option value="7">Binary Search</option>
-        </optgroup>
-        <optgroup label="Recursion">
-          <option value="8">Factorial (Recursion)</option>
-        </optgroup>
-      </select>
+  <!-- === Visualization Area === -->
+  <main>
+    <div class="array"></div>
+  </main>
 
-      <!-- Sorting Options -->
-      <div id="sizeGroup" style="display:none;">
-        <label>Array Size</label>
-        <select class="size-menu">
-          <option value="0">Select Size</option>
-          <option value="5">5</option>
-          <option value="10">10</option>
-          <option value="15">15</option>
-          <option value="20">20</option>
-        </select>
-      </div>
-
-      <div id="speedGroup" style="display:none;">
-        <label>Speed</label>
-        <select class="speed-menu">
-          <option value="1">Slow</option>
-          <option value="3">Medium</option>
-          <option value="5">Fast</option>
-        </select>
-      </div>
-
-      <!-- Searching Options -->
-      <div id="targetGroup" style="display:none;">
-        <label>Target Value</label>
-        <input type="number" id="targetInput" placeholder="Enter value to search" />
-      </div>
-
-      <!-- Recursion Options -->
-      <div id="recursionInputGroup" style="display:none;">
-        <label>Enter a number (for factorial)</label>
-        <input type="number" id="recursionInput" placeholder="Enter n" />
-      </div>
-
-      <!-- Buttons -->
-      <div class="btn-group">
-        <button class="start">▶ Start</button>
-        <button class="reset">🔄 Reset</button>
-      </div>
+  <!-- === Metrics Panel === -->
+  <section class="metrics">
+    <div class="metric-card">
+      <h3>🔍 Comparisons</h3>
+      <p id="comparisons">0</p>
     </div>
-
-    <!-- Visualization -->
-    <div class="visualization">
-      <div class="array"></div>
+    <div class="metric-card">
+      <h3>🔄 Swaps</h3>
+      <p id="swaps">0</p>
     </div>
-
-    <!-- Metrics -->
-    <div class="metrics-panel">
-      <h2>Statistics</h2>
-      <p>Comparisons: <span id="comparisons">0</span></p>
-      <p>Swaps: <span id="swaps">0</span></p>
-      <p>Recursive Calls: <span id="recCalls">0</span></p>
-      <p>Time Taken (ms): <span id="timeTaken">0</span></p>
+    <div class="metric-card">
+      <h3>🌲 Recursive Calls</h3>
+      <p id="recCalls">0</p>
     </div>
-  </div>
+    <div class="metric-card">
+      <h3>⏱ Time Taken (ms)</h3>
+      <p id="timeTaken">0</p>
+    </div>
+  </section>
 
-  <!-- Scripts -->
+  <!-- === Scripts === -->
   <script src="./scripts/helper.js"></script>
   <script src="./scripts/sort-algorithms.js"></script>
   <script src="./scripts/search-algorithms.js"></script>

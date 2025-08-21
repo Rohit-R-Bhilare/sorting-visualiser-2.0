@@ -1,4 +1,4 @@
-/* ===== General Reset ===== */
+/* ===== Global Reset ===== */
 * {
   margin: 0;
   padding: 0;
@@ -8,207 +8,207 @@
 
 body {
   background: #f9fafb;
-  color: #1f2937;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+  color: #111827;
+  transition: background 0.3s, color 0.3s;
 }
 
-/* ===== Navbar ===== */
-.navbar {
+/* ===== Header ===== */
+header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #3b82f6;
+  padding: 1rem 2rem;
+  background: #2563eb;
   color: white;
-  padding: 12px 20px;
 }
 
-.navbar h1 {
-  font-size: 20px;
+header h1 {
+  font-size: 1.5rem;
 }
 
 .dark-toggle {
-  background: white;
-  color: #3b82f6;
+  background: #111827;
+  color: white;
   border: none;
-  border-radius: 6px;
-  padding: 6px 10px;
-  cursor: pointer;
-}
-
-/* ===== Main Layout ===== */
-.container {
-  display: grid;
-  grid-template-columns: 250px 1fr 250px;
-  gap: 20px;
-  padding: 20px;
-  flex: 1;
-}
-
-.controls, .metrics-panel {
-  background: white;
-  padding: 15px;
+  padding: 0.5rem 1rem;
   border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: background 0.3s;
 }
 
-.controls h2, .metrics-panel h2 {
-  margin-bottom: 12px;
-  font-size: 18px;
-  color: #111827;
+.dark-toggle:hover {
+  background: #374151;
 }
 
-label {
-  font-weight: bold;
-  margin: 8px 0 4px;
-  display: block;
-}
-
-select, input {
-  width: 100%;
-  padding: 6px 8px;
-  margin-bottom: 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 14px;
-}
-
-.btn-group {
+/* ===== Dashboard Cards ===== */
+.dashboard {
   display: flex;
-  justify-content: space-between;
-  margin-top: 10px;
+  justify-content: center;
+  gap: 1.5rem;
+  margin: 2rem 0;
+  flex-wrap: wrap;
 }
 
-button.start, button.reset {
-  flex: 1;
-  margin: 5px;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  cursor: pointer;
+.algo-card {
+  flex: 1 1 200px;
+  max-width: 250px;
+  padding: 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  text-align: center;
+  font-size: 1.3rem;
   font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.3s;
 }
 
-button.start {
-  background: #10b981;
-  color: white;
-}
-
-button.reset {
-  background: #ef4444;
-  color: white;
-}
-
-/* ===== Visualization ===== */
-.visualization {
+.algo-card:hover {
+  transform: translateY(-5px);
   background: #f3f4f6;
-  padding: 15px;
-  border-radius: 8px;
-  min-height: 400px;
+}
+
+/* ===== Options Panel ===== */
+.options-panel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin: 1rem auto;
+  flex-wrap: wrap;
+  padding: 1rem;
+}
+
+.options-panel label {
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
+
+.options-panel input,
+.options-panel select,
+.options-panel button {
+  padding: 0.5rem 1rem;
+  margin: 0.25rem;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+}
+
+.options-panel button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.options-panel button:hover {
+  background: #1e40af;
+}
+
+/* ===== Visualization Area ===== */
+main {
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  overflow-x: auto;
+  height: 300px;
+  margin: 2rem auto;
+  padding: 1rem;
 }
 
 .array {
   display: flex;
-  flex-direction: row;
-  gap: 8px;
   align-items: flex-end;
-  justify-content: center;
-  flex-wrap: nowrap;
+  gap: 4px;
+  height: 100%;
 }
 
-/* Bars for Sorting */
+/* Sorting Bars */
 .cell {
   width: 20px;
-  background: #3b82f6;
+  background: #60a5fa;
+  text-align: center;
+  font-size: 0.7rem;
   border-radius: 4px;
-  transition: height 0.3s, background 0.3s;
+  color: white;
 }
 
-/* Boxes for Searching */
+/* Searching Cells */
 .s-cell {
-  padding: 10px;
-  min-width: 40px;
-  text-align: center;
-  border: 2px solid #3b82f6;
+  width: 40px;
+  height: 40px;
+  background: #93c5fd;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   border-radius: 6px;
   font-weight: bold;
-  background: white;
-  transition: background 0.3s, transform 0.3s;
 }
 
-/* Recursion Visualization */
+.current { background: #f59e0b !important; }
+.done { background: #10b981 !important; }
+.fail { background: #ef4444 !important; }
+.fade { opacity: 0.4; }
+
+/* Recursion Steps */
 .recursion {
-  margin: 5px 0;
-  padding: 8px 12px;
+  background: #dbeafe;
+  padding: 0.5rem 1rem;
+  margin: 0.25rem 0;
+  border-left: 4px solid #2563eb;
   border-radius: 6px;
-  background: #e5e7eb;
-  font-family: monospace;
-  width: fit-content;
-}
-
-/* ===== Highlighting States ===== */
-.current {
-  background: #f59e0b !important;
-}
-
-.done {
-  background: #10b981 !important;
-  color: white !important;
-}
-
-.fail {
-  background: #ef4444 !important;
-  color: white !important;
-}
-
-.fade {
-  opacity: 0.4;
+  font-size: 0.9rem;
 }
 
 /* ===== Metrics Panel ===== */
-.metrics-panel p {
-  font-size: 14px;
-  margin: 6px 0;
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin: 2rem;
+}
+
+.metric-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.metric-card h3 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.metric-card p {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #2563eb;
 }
 
 /* ===== Dark Mode ===== */
-body.dark-mode {
+body.dark {
   background: #111827;
   color: #f9fafb;
 }
 
-body.dark-mode .navbar {
+body.dark header {
+  background: #1e293b;
+}
+
+body.dark .algo-card,
+body.dark .metric-card {
   background: #1f2937;
   color: #f9fafb;
 }
 
-body.dark-mode .controls, 
-body.dark-mode .metrics-panel {
-  background: #1f2937;
-  color: #f9fafb;
-}
-
-body.dark-mode .visualization {
-  background: #374151;
-}
-
-body.dark-mode .cell {
-  background: #60a5fa;
-}
-
-body.dark-mode .s-cell {
-  border-color: #60a5fa;
-  background: #1f2937;
-  color: #f9fafb;
-}
-
-body.dark-mode .recursion {
+body.dark .options-panel input,
+body.dark .options-panel select {
   background: #374151;
   color: #f9fafb;
+  border: 1px solid #4b5563;
+}
+
+body.dark .options-panel button {
+  background: #3b82f6;
 }

@@ -1,137 +1,135 @@
-// ===== Bubble Sort =====
+// ====== Bubble Sort ======
 async function bubbleSort(arr, speed) {
   const bars = document.querySelectorAll(".cell");
-  const n = arr.length;
+  let n = arr.length;
 
   for (let i = 0; i < n - 1; i++) {
     for (let j = 0; j < n - i - 1; j++) {
       incrementComparisons();
+      await highlightBars(bars, [j, j + 1], "#f59e0b", speed);
 
-      highlight(bars[j], "current");
-      highlight(bars[j + 1], "current");
-      await sleep(400 / speed);
-
-      if (parseInt(bars[j].textContent) > parseInt(bars[j + 1].textContent)) {
-        await swap(bars[j], bars[j + 1], speed);
+      if (arr[j] > arr[j + 1]) {
+        [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+        await swapBars(bars[j], bars[j + 1], speed);
       }
-
-      unhighlight(bars[j], "current");
-      unhighlight(bars[j + 1], "current");
     }
-    highlight(bars[n - i - 1], "done");
   }
-  highlight(bars[0], "done");
 }
 
-// ===== Selection Sort =====
+// ====== Selection Sort ======
 async function selectionSort(arr, speed) {
   const bars = document.querySelectorAll(".cell");
-  const n = arr.length;
+  let n = arr.length;
 
-  for (let i = 0; i < n - 1; i++) {
+  for (let i = 0; i < n; i++) {
     let minIdx = i;
-    highlight(bars[i], "current");
-
     for (let j = i + 1; j < n; j++) {
       incrementComparisons();
-      highlight(bars[j], "current");
-      await sleep(300 / speed);
+      await highlightBars(bars, [minIdx, j], "#f59e0b", speed);
 
-      if (parseInt(bars[j].textContent) < parseInt(bars[minIdx].textContent)) {
+      if (arr[j] < arr[minIdx]) {
         minIdx = j;
       }
-      unhighlight(bars[j], "current");
     }
 
     if (minIdx !== i) {
-      await swap(bars[i], bars[minIdx], speed);
+      [arr[i], arr[minIdx]] = [arr[minIdx], arr[i]];
+      await swapBars(bars[i], bars[minIdx], speed);
     }
-
-    unhighlight(bars[i], "current");
-    highlight(bars[i], "done");
   }
-  highlight(bars[n - 1], "done");
 }
 
-// ===== Insertion Sort =====
+// ====== Insertion Sort ======
 async function insertionSort(arr, speed) {
   const bars = document.querySelectorAll(".cell");
-  const n = arr.length;
+  let n = arr.length;
 
   for (let i = 1; i < n; i++) {
-    let j = i;
-    highlight(bars[j], "current");
+    let key = arr[i];
+    let j = i - 1;
 
-    while (j > 0 && parseInt(bars[j - 1].textContent) > parseInt(bars[j].textContent)) {
+    while (j >= 0 && arr[j] > key) {
       incrementComparisons();
-      await swap(bars[j - 1], bars[j], speed);
+      arr[j + 1] = arr[j];
+
+      bars[j + 1].style.height = bars[j].style.height;
+      bars[j + 1].textContent = bars[j].textContent;
+
       j--;
+      incrementSwaps();
+      await sleep(500 / speed);
     }
-    unhighlight(bars[j], "current");
-  }
+    arr[j + 1] = key;
 
-  for (let k = 0; k < n; k++) {
-    highlight(bars[k], "done");
+    bars[j + 1].style.height = key * 3 + "px";
+    bars[j + 1].textContent = key;
+
+    await sleep(500 / speed);
   }
 }
 
-// ===== Merge Sort =====
-async function mergeSort(arr, left, right, speed) {
-  if (left >= right) return;
+// ====== Merge Sort ======
+async function mergeSort(arr, l, r, speed) {
+  if (l >= r) return;
+  const m = Math.floor((l + r) / 2);
 
-  const mid = Math.floor((left + right) / 2);
-  await mergeSort(arr, left, mid, speed);
-  await mergeSort(arr, mid + 1, right, speed);
-  await merge(arr, left, mid, right, speed);
+  await mergeSort(arr, l, m, speed);
+  await mergeSort(arr, m + 1, r, speed);
+  await merge(arr, l, m, r, speed);
 }
 
-async function merge(arr, left, mid, right, speed) {
+async function merge(arr, l, m, r, speed) {
   const bars = document.querySelectorAll(".cell");
 
-  let leftArr = [];
-  let rightArr = [];
+  let n1 = m - l + 1;
+  let n2 = r - m;
 
-  for (let i = left; i <= mid; i++) leftArr.push(parseInt(bars[i].textContent));
-  for (let j = mid + 1; j <= right; j++) rightArr.push(parseInt(bars[j].textContent));
+  let L = arr.slice(l, m + 1);
+  let R = arr.slice(m + 1, r + 1);
 
-  let i = 0, j = 0, k = left;
+  let i = 0, j = 0, k = l;
 
-  while (i < leftArr.length && j < rightArr.length) {
+  while (i < n1 && j < n2) {
     incrementComparisons();
+    await highlightBars(bars, [k], "#f59e0b", speed);
 
-    highlight(bars[k], "current");
-    await sleep(300 / speed);
-
-    if (leftArr[i] <= rightArr[j]) {
-      bars[k].style.height = leftArr[i] * 3 + "px";
-      bars[k].textContent = leftArr[i];
+    if (L[i] <= R[j]) {
+      arr[k] = L[i];
+      bars[k].style.height = L[i] * 3 + "px";
+      bars[k].textContent = L[i];
       i++;
     } else {
-      bars[k].style.height = rightArr[j] * 3 + "px";
-      bars[k].textContent = rightArr[j];
+      arr[k] = R[j];
+      bars[k].style.height = R[j] * 3 + "px";
+      bars[k].textContent = R[j];
       j++;
     }
-    unhighlight(bars[k], "current");
     k++;
+    await sleep(500 / speed);
   }
 
-  while (i < leftArr.length) {
-    bars[k].style.height = leftArr[i] * 3 + "px";
-    bars[k].textContent = leftArr[i];
+  while (i < n1) {
+    arr[k] = L[i];
+    bars[k].style.height = L[i] * 3 + "px";
+    bars[k].textContent = L[i];
     i++; k++;
+    await sleep(400 / speed);
   }
 
-  while (j < rightArr.length) {
-    bars[k].style.height = rightArr[j] * 3 + "px";
-    bars[k].textContent = rightArr[j];
+  while (j < n2) {
+    arr[k] = R[j];
+    bars[k].style.height = R[j] * 3 + "px";
+    bars[k].textContent = R[j];
     j++; k++;
+    await sleep(400 / speed);
   }
 }
 
-// ===== Quick Sort =====
+// ====== Quick Sort ======
 async function quickSort(arr, low, high, speed) {
   if (low < high) {
     let pi = await partition(arr, low, high, speed);
+
     await quickSort(arr, low, pi - 1, speed);
     await quickSort(arr, pi + 1, high, speed);
   }
@@ -139,30 +137,22 @@ async function quickSort(arr, low, high, speed) {
 
 async function partition(arr, low, high, speed) {
   const bars = document.querySelectorAll(".cell");
-  let pivot = parseInt(bars[high].textContent);
-  highlight(bars[high], "current");
-
+  let pivot = arr[high];
   let i = low - 1;
 
   for (let j = low; j < high; j++) {
     incrementComparisons();
+    await highlightBars(bars, [j, high], "#f59e0b", speed);
 
-    highlight(bars[j], "current");
-    await sleep(300 / speed);
-
-    if (parseInt(bars[j].textContent) < pivot) {
+    if (arr[j] < pivot) {
       i++;
-      await swap(bars[i], bars[j], speed);
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+      await swapBars(bars[i], bars[j], speed);
     }
-    unhighlight(bars[j], "current");
   }
 
-  await swap(bars[i + 1], bars[high], speed);
-  unhighlight(bars[high], "current");
-
-  for (let k = low; k <= high; k++) {
-    if (k <= i + 1) highlight(bars[k], "done");
-  }
+  [arr[i + 1], arr[high]] = [arr[high], arr[i + 1]];
+  await swapBars(bars[i + 1], bars[high], speed);
 
   return i + 1;
 }

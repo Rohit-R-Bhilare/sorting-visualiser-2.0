@@ -1,58 +1,27 @@
-// ===== Delay Utility =====
+// ====== Delay Helper ======
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// ===== Metrics =====
-let comparisons = 0;
-let swaps = 0;
-let recCalls = 0;
-
-function resetMetrics() {
-  comparisons = 0;
-  swaps = 0;
-  recCalls = 0;
-  updateMetrics("comparisons", comparisons);
-  updateMetrics("swaps", swaps);
-  updateMetrics("recCalls", recCalls);
-  updateMetrics("timeTaken", 0);
-}
-
-function updateMetrics(type, value) {
-  document.getElementById(type).textContent = value;
-}
-
+// ====== Metrics Update ======
 function incrementComparisons() {
   comparisons++;
-  updateMetrics("comparisons", comparisons);
+  document.getElementById("comparisons").textContent = comparisons;
 }
 
 function incrementSwaps() {
   swaps++;
-  updateMetrics("swaps", swaps);
+  document.getElementById("swaps").textContent = swaps;
 }
 
 function incrementRecCalls() {
   recCalls++;
-  updateMetrics("recCalls", recCalls);
+  document.getElementById("recCalls").textContent = recCalls;
 }
 
-// ===== Highlighting (for visualization) =====
-function highlight(element, className) {
-  if (element) element.classList.add(className);
-}
-
-function unhighlight(element, className) {
-  if (element) element.classList.remove(className);
-}
-
-// ===== Swap for Sorting =====
-async function swap(bar1, bar2, speed) {
+// ====== Sorting Helpers ======
+async function swapBars(bar1, bar2, speed) {
   incrementSwaps();
-  highlight(bar1, "current");
-  highlight(bar2, "current");
-
-  await sleep(500 / speed);
 
   let tempHeight = bar1.style.height;
   let tempText = bar1.textContent;
@@ -63,6 +32,40 @@ async function swap(bar1, bar2, speed) {
   bar2.style.height = tempHeight;
   bar2.textContent = tempText;
 
-  unhighlight(bar1, "current");
-  unhighlight(bar2, "current");
+  await sleep(500 / speed);
+}
+
+async function highlightBars(bars, indices, color, speed) {
+  indices.forEach(i => {
+    if (bars[i]) bars[i].style.background = color;
+  });
+  await sleep(400 / speed);
+  indices.forEach(i => {
+    if (bars[i]) bars[i].style.background = "#60a5fa";
+  });
+}
+
+// ====== Searching Helpers ======
+async function highlightBox(box, color, speed) {
+  box.classList.add(color);
+  await sleep(500 / speed);
+  box.classList.remove(color);
+}
+
+async function markFound(box) {
+  box.classList.add("done");
+}
+
+async function markNotFound(box) {
+  box.classList.add("fail");
+}
+
+// ====== Reset Metrics & Visualization ======
+function resetVisualization() {
+  const arrayContainer = document.querySelector(".array");
+  arrayContainer.innerHTML = "";
+  document.getElementById("comparisons").textContent = "0";
+  document.getElementById("swaps").textContent = "0";
+  document.getElementById("recCalls").textContent = "0";
+  document.getElementById("timeTaken").textContent = "0";
 }
