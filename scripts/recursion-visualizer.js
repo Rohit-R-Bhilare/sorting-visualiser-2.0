@@ -1,33 +1,38 @@
-// ====== Recursion Visualizer (Factorial) ======
+// ===== Recursion Visualizer =====
 
+// Factorial Visualizer
 async function factorialVisualizer(n, depth = 0) {
-  incrementRecCalls();
+  showRecursionStep(`factorial(${n}) called`, depth);
+  await sleep(2);
 
-  // Create a step element
-  const step = document.createElement("div");
-  step.classList.add("recursion");
-  step.textContent = `Call: factorial(${n})`;
-  document.querySelector(".array").appendChild(step);
-
-  await sleep(500);
-
-  if (n === 1) {
-    const base = document.createElement("div");
-    base.classList.add("recursion");
-    base.textContent = `Return: factorial(1) = 1`;
-    document.querySelector(".array").appendChild(base);
+  if (n === 0 || n === 1) {
+    showRecursionStep(`return 1`, depth);
     return 1;
   }
 
-  // Recursive call
-  const result = await factorialVisualizer(n - 1, depth + 1);
+  let result = n * (await factorialVisualizer(n - 1, depth + 1));
+  showRecursionStep(`return ${result}`, depth);
+  return result;
+}
 
-  const ret = document.createElement("div");
-  ret.classList.add("recursion");
-  ret.textContent = `Return: factorial(${n}) = ${n} * ${result} = ${n * result}`;
-  document.querySelector(".array").appendChild(ret);
+// Fibonacci Visualizer
+async function fibonacciVisualizer(n, depth = 0) {
+  showRecursionStep(`fibonacci(${n}) called`, depth);
+  await sleep(2);
 
-  await sleep(500);
+  if (n === 0) {
+    showRecursionStep(`return 0`, depth);
+    return 0;
+  }
+  if (n === 1) {
+    showRecursionStep(`return 1`, depth);
+    return 1;
+  }
 
-  return n * result;
+  let left = await fibonacciVisualizer(n - 1, depth + 1);
+  let right = await fibonacciVisualizer(n - 2, depth + 1);
+
+  let result = left + right;
+  showRecursionStep(`return ${result}`, depth);
+  return result;
 }

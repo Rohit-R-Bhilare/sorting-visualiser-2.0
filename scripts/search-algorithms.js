@@ -1,69 +1,124 @@
-// ====== Linear Search ======
+// ===== Searching Algorithms =====
+
+// Linear Search
 async function linearSearch(arr, target, speed) {
-  const boxes = document.querySelectorAll(".s-cell");
+  const container = document.querySelector(".array");
+  container.innerHTML = "";
+  arr.forEach(val => {
+    const cell = document.createElement("div");
+    cell.classList.add("s-cell");
+    cell.textContent = val;
+    container.appendChild(cell);
+  });
+
+  const cells = document.querySelectorAll(".s-cell");
 
   for (let i = 0; i < arr.length; i++) {
     incrementComparisons();
-
-    // Highlight current box
-    boxes[i].classList.add("current");
-    await sleep(500 / speed);
+    cells[i].classList.add("current");
+    await sleep(speed);
 
     if (arr[i] === target) {
-      await markFound(boxes[i]);
+      cells[i].classList.remove("current");
+      cells[i].classList.add("done");
       return true;
     }
 
-    boxes[i].classList.remove("current");
-    boxes[i].classList.add("fade");
+    cells[i].classList.remove("current");
+    cells[i].classList.add("fade");
   }
 
-  // Not found
-  for (let i = 0; i < boxes.length; i++) {
-    await markNotFound(boxes[i]);
-  }
   return false;
 }
 
-// ====== Binary Search ======
+// Binary Search
 async function binarySearch(arr, target, speed) {
-  const boxes = document.querySelectorAll(".s-cell");
-  let left = 0;
-  let right = arr.length - 1;
+  arr.sort((a, b) => a - b);
+  const container = document.querySelector(".array");
+  container.innerHTML = "";
+  arr.forEach(val => {
+    const cell = document.createElement("div");
+    cell.classList.add("s-cell");
+    cell.textContent = val;
+    container.appendChild(cell);
+  });
 
+  const cells = document.querySelectorAll(".s-cell");
+
+  let left = 0, right = arr.length - 1;
   while (left <= right) {
-    const mid = Math.floor((left + right) / 2);
+    let mid = Math.floor((left + right) / 2);
     incrementComparisons();
 
-    // Highlight mid box
-    boxes[mid].classList.add("current");
-    await sleep(600 / speed);
+    cells[mid].classList.add("current");
+    await sleep(speed);
 
     if (arr[mid] === target) {
-      await markFound(boxes[mid]);
+      cells[mid].classList.remove("current");
+      cells[mid].classList.add("done");
       return true;
     } else if (arr[mid] < target) {
-      // Fade out left half
-      for (let i = left; i <= mid; i++) {
-        boxes[i].classList.add("fade");
-      }
+      for (let i = left; i <= mid; i++) cells[i].classList.add("fade");
       left = mid + 1;
     } else {
-      // Fade out right half
-      for (let i = mid; i <= right; i++) {
-        boxes[i].classList.add("fade");
-      }
+      for (let i = mid; i <= right; i++) cells[i].classList.add("fade");
       right = mid - 1;
     }
 
-    boxes[mid].classList.remove("current");
+    cells[mid].classList.remove("current");
   }
 
-  // Not found
-  for (let i = 0; i < boxes.length; i++) {
-    if (!boxes[i].classList.contains("done")) {
-      await markNotFound(boxes[i]);
+  return false;
+}
+
+// Jump Search
+async function jumpSearch(arr, target, speed) {
+  arr.sort((a, b) => a - b);
+  const container = document.querySelector(".array");
+  container.innerHTML = "";
+  arr.forEach(val => {
+    const cell = document.createElement("div");
+    cell.classList.add("s-cell");
+    cell.textContent = val;
+    container.appendChild(cell);
+  });
+
+  const cells = document.querySelectorAll(".s-cell");
+  const n = arr.length;
+  let step = Math.floor(Math.sqrt(n));
+  let prev = 0;
+
+  // Jump through blocks
+  while (arr[Math.min(step, n) - 1] < target) {
+    incrementComparisons();
+
+    // Highlight jump block
+    for (let i = prev; i < Math.min(step, n); i++) {
+      cells[i].classList.add("fade");
     }
+
+    prev = step;
+    step += Math.floor(Math.sqrt(n));
+    await sleep(speed);
+
+    if (prev >= n) return false;
   }
+
+  // Linear search in block
+  for (let i = prev; i < Math.min(step, n); i++) {
+    incrementComparisons();
+    cells[i].classList.add("current");
+    await sleep(speed);
+
+    if (arr[i] === target) {
+      cells[i].classList.remove("current");
+      cells[i].classList.add("done");
+      return true;
+    }
+
+    cells[i].classList.remove("current");
+    cells[i].classList.add("fade");
+  }
+
   return false;
 }

@@ -6,49 +6,47 @@
   <title>Algorithm Visualizer</title>
   <link rel="stylesheet" href="./css/style.css" />
 </head>
-<body>
-  <!-- === Header === -->
-  <header>
-    <h1>🚀 Algorithm Visualizer</h1>
-    <button class="dark-toggle">🌙</button>
-  </header>
+<body class="dark">
+  <!-- Theme Toggle -->
+  <button id="themeToggle" class="theme-btn">🌙</button>
 
-  <!-- === Dashboard Cards === -->
-  <section class="dashboard">
-    <div class="algo-card" id="sortingCard">🟦 Sorting</div>
-    <div class="algo-card" id="searchingCard">🟩 Searching</div>
-    <div class="algo-card" id="recursionCard">🟨 Recursion</div>
-  </section>
+  <div class="container">
+    <h1 class="title">Algorithm Visualizer</h1>
 
-  <!-- === Expanded Options (Dynamic) === -->
-  <section class="options-panel" id="optionsPanel"></section>
+    <!-- Dashboard Cards -->
+    <div class="dashboard">
+      <div class="algo-card" data-type="sorting">
+        <h2>Sorting</h2>
+        <p>Visualize sorting algorithms step by step.</p>
+      </div>
+      <div class="algo-card" data-type="searching">
+        <h2>Searching</h2>
+        <p>Find values using different search strategies.</p>
+      </div>
+      <div class="algo-card" data-type="recursion">
+        <h2>Recursion</h2>
+        <p>See recursive calls unfold visually.</p>
+      </div>
+    </div>
 
-  <!-- === Visualization Area === -->
-  <main>
-    <div class="array"></div>
-  </main>
+    <!-- Options Panel -->
+    <div id="optionsPanel" class="options-panel"></div>
 
-  <!-- === Metrics Panel === -->
-  <section class="metrics">
-    <div class="metric-card">
-      <h3>🔍 Comparisons</h3>
-      <p id="comparisons">0</p>
+    <!-- Visualization -->
+    <div class="visualizer">
+      <div class="array"></div>
     </div>
-    <div class="metric-card">
-      <h3>🔄 Swaps</h3>
-      <p id="swaps">0</p>
+
+    <!-- Metrics -->
+    <div class="metrics">
+      <div class="metric"><strong>Comparisons:</strong> <span id="comparisons">0</span></div>
+      <div class="metric"><strong>Swaps:</strong> <span id="swaps">0</span></div>
+      <div class="metric"><strong>Recursive Calls:</strong> <span id="recCalls">0</span></div>
+      <div class="metric"><strong>Time Taken (ms):</strong> <span id="timeTaken">0</span></div>
     </div>
-    <div class="metric-card">
-      <h3>🌲 Recursive Calls</h3>
-      <p id="recCalls">0</p>
-    </div>
-    <div class="metric-card">
-      <h3>⏱ Time Taken (ms)</h3>
-      <p id="timeTaken">0</p>
-    </div>
-  </section>
-  
-  <!-- === Scripts === -->
+  </div>
+
+  <!-- Scripts -->
   <script src="./scripts/helper.js"></script>
   <script src="./scripts/sort-algorithms.js"></script>
   <script src="./scripts/search-algorithms.js"></script>
