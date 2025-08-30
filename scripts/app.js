@@ -170,6 +170,8 @@ document.getElementById("reset-btn").addEventListener("click", () => {
   document.getElementById("dashboard").classList.remove("hidden");
 });
 
+
+
 // ===== Dark / Light Mode =====
 document.getElementById("theme-toggle").addEventListener("click", () => {
   document.body.classList.toggle("dark");
