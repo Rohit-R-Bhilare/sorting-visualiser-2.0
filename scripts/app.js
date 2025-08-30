@@ -114,6 +114,7 @@ function buildControls(category) {
   }
 }
 
+
 // Helper wrapper
 function labelWrap(label, element) {
   let div = document.createElement("div");
