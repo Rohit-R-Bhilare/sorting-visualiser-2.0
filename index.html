@@ -6,51 +6,78 @@
   <title>Algorithm Visualizer</title>
   <link rel="stylesheet" href="./css/style.css" />
 </head>
-<body class="dark">
-  <!-- Theme Toggle -->
-  <button id="themeToggle" class="theme-btn">🌙</button>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <h1>🚀 Algorithm Visualizer</h1>
+    <button id="theme-toggle" class="btn">🌙 Dark / ☀️ Light</button>
+  </header>
 
-  <div class="container">
-    <h1 class="title">Algorithm Visualizer</h1>
-
-    <!-- Dashboard Cards -->
-    <div class="dashboard">
-      <div class="algo-card" data-type="sorting">
-        <h2>Sorting</h2>
-        <p>Visualize sorting algorithms step by step.</p>
-      </div>
-      <div class="algo-card" data-type="searching">
-        <h2>Searching</h2>
-        <p>Find values using different search strategies.</p>
-      </div>
-      <div class="algo-card" data-type="recursion">
-        <h2>Recursion</h2>
-        <p>See recursive calls unfold visually.</p>
-      </div>
+  <!-- Dashboard (Categories as big clickable cards) -->
+  <section id="dashboard" class="dashboard">
+    <h2>Select an Algorithm Category</h2>
+    <div class="card-grid">
+      <div class="algo-card" data-category="sorting">Sorting Algorithms</div>
+      <div class="algo-card" data-category="searching">Searching Algorithms</div>
+      <div class="algo-card" data-category="recursion">Recursion & Backtracking</div>
+      <div class="algo-card" data-category="divide-conquer">Divide & Conquer</div>
+      <div class="algo-card" data-category="greedy">Greedy Algorithms</div>
+      <div class="algo-card" data-category="dp">Dynamic Programming (DP)</div>
+      <div class="algo-card" data-category="graph">Graph Algorithms</div>
+      <div class="algo-card" data-category="string">String Algorithms</div>
+      <div class="algo-card" data-category="math">Mathematical Algorithms</div>
+      <div class="algo-card" data-category="advanced">Advanced Topics</div>
     </div>
+  </section>
 
-    <!-- Options Panel -->
-    <div id="optionsPanel" class="options-panel"></div>
-
-    <!-- Visualization -->
-    <div class="visualizer">
-      <div class="array"></div>
+  <!-- Algorithm Controls (Dynamic per choice) -->
+  <section id="controls-section" class="hidden">
+    <h2 id="algo-title">Algorithm Controls</h2>
+    <div id="controls"></div>
+    <div class="controls-buttons">
+      <button id="start-btn" class="btn primary">▶ Start</button>
+      <button id="reset-btn" class="btn">🔄 Reset</button>
     </div>
+  </section>
 
-    <!-- Metrics -->
-    <div class="metrics">
-      <div class="metric"><strong>Comparisons:</strong> <span id="comparisons">0</span></div>
-      <div class="metric"><strong>Swaps:</strong> <span id="swaps">0</span></div>
-      <div class="metric"><strong>Recursive Calls:</strong> <span id="recCalls">0</span></div>
-      <div class="metric"><strong>Time Taken (ms):</strong> <span id="timeTaken">0</span></div>
+  <!-- Visualization Section -->
+  <section id="visualization">
+    <h2>Visualization</h2>
+    <div id="bars-container" class="bars-container"></div>
+    <div id="dp-grid" class="dp-grid"></div>
+    <div id="recursion-steps" class="recursion-steps"></div>
+    <canvas id="graph-canvas"></canvas>
+  </section>
+
+  <!-- Statistics Panel -->
+  <section id="metrics-panel">
+    <h2>📊 Statistics</h2>
+    <div class="metrics-grid">
+      <div class="metric-card"><span>Comparisons</span><p id="comparisons">0</p></div>
+      <div class="metric-card"><span>Swaps</span><p id="swaps">0</p></div>
+      <div class="metric-card"><span>Recursive Calls</span><p id="recursive-calls">0</p></div>
+      <div class="metric-card"><span>Steps</span><p id="steps">0</p></div>
     </div>
-  </div>
+  </section>
+
+  <!-- Results Cards (for recursion/DP outputs) -->
+  <section id="results-section">
+    <h2>Results & Steps</h2>
+    <div id="results-cards" class="results-cards"></div>
+  </section>
 
   <!-- Scripts -->
   <script src="./scripts/helper.js"></script>
   <script src="./scripts/sort-algorithms.js"></script>
   <script src="./scripts/search-algorithms.js"></script>
-  <script src="./scripts/recursion-visualizer.js"></script>
+  <script src="./scripts/recursion-backtracking.js"></script>
+  <script src="./scripts/divide-conquer.js"></script>
+  <script src="./scripts/greedy-algorithms.js"></script>
+  <script src="./scripts/dp-algorithms.js"></script>
+  <!-- <script src="./scripts/graph-algorithms.js"></script>
+  <script src="./scripts/string-algorithms.js"></script>
+  <script src="./scripts/math-algorithms.js"></script>
+  <script src="./scripts/advanced-algorithms.js"></script> -->
   <script src="./scripts/app.js"></script>
 </body>
 </html>

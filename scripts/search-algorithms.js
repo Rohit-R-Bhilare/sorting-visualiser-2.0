@@ -1,124 +1,133 @@
-// ===== Searching Algorithms =====
+// ================= SEARCHING ALGORITHMS ================= //
 
-// Linear Search
-async function linearSearch(arr, target, speed) {
-  const container = document.querySelector(".array");
-  container.innerHTML = "";
-  arr.forEach(val => {
-    const cell = document.createElement("div");
-    cell.classList.add("s-cell");
-    cell.textContent = val;
-    container.appendChild(cell);
-  });
-
-  const cells = document.querySelectorAll(".s-cell");
-
-  for (let i = 0; i < arr.length; i++) {
-    incrementComparisons();
-    cells[i].classList.add("current");
+// ===== Linear Search =====
+async function linearSearch(bars, target, speed) {
+  resetBars(bars);
+  for (let i = 0; i < bars.length; i++) {
+    colorBar(bars[i], "red");
+    updateComparisons();
     await sleep(speed);
 
-    if (arr[i] === target) {
-      cells[i].classList.remove("current");
-      cells[i].classList.add("done");
-      return true;
+    if (parseInt(bars[i].textContent) === target) {
+      colorBar(bars[i], "green");
+      addResultCard("Linear Search", `Found ${target} at index ${i}`);
+      return;
     }
-
-    cells[i].classList.remove("current");
-    cells[i].classList.add("fade");
+    resetBars(bars);
   }
-
-  return false;
+  addResultCard("Linear Search", `${target} not found`);
 }
 
-// Binary Search
-async function binarySearch(arr, target, speed) {
+// ===== Binary Search =====
+async function binarySearch(bars, target, speed) {
+  // Binary search requires sorted array
+  let arr = Array.from(bars).map(b => parseInt(b.textContent));
   arr.sort((a, b) => a - b);
-  const container = document.querySelector(".array");
-  container.innerHTML = "";
-  arr.forEach(val => {
-    const cell = document.createElement("div");
-    cell.classList.add("s-cell");
-    cell.textContent = val;
-    container.appendChild(cell);
-  });
+  renderArray(arr);
+  bars = document.querySelectorAll(".bar");
 
-  const cells = document.querySelectorAll(".s-cell");
-
-  let left = 0, right = arr.length - 1;
-  while (left <= right) {
-    let mid = Math.floor((left + right) / 2);
-    incrementComparisons();
-
-    cells[mid].classList.add("current");
+  let low = 0, high = arr.length - 1;
+  while (low <= high) {
+    let mid = Math.floor((low + high) / 2);
+    colorBar(bars[mid], "orange");
+    updateComparisons();
     await sleep(speed);
 
     if (arr[mid] === target) {
-      cells[mid].classList.remove("current");
-      cells[mid].classList.add("done");
-      return true;
+      colorBar(bars[mid], "green");
+      addResultCard("Binary Search", `Found ${target} at index ${mid}`);
+      return;
     } else if (arr[mid] < target) {
-      for (let i = left; i <= mid; i++) cells[i].classList.add("fade");
-      left = mid + 1;
+      low = mid + 1;
     } else {
-      for (let i = mid; i <= right; i++) cells[i].classList.add("fade");
-      right = mid - 1;
+      high = mid - 1;
     }
-
-    cells[mid].classList.remove("current");
+    resetBars(bars);
   }
-
-  return false;
+  addResultCard("Binary Search", `${target} not found`);
 }
 
-// Jump Search
-async function jumpSearch(arr, target, speed) {
+// ===== Jump Search =====
+async function jumpSearch(bars, target, speed) {
+  let arr = Array.from(bars).map(b => parseInt(b.textContent));
   arr.sort((a, b) => a - b);
-  const container = document.querySelector(".array");
-  container.innerHTML = "";
-  arr.forEach(val => {
-    const cell = document.createElement("div");
-    cell.classList.add("s-cell");
-    cell.textContent = val;
-    container.appendChild(cell);
-  });
+  renderArray(arr);
+  bars = document.querySelectorAll(".bar");
 
-  const cells = document.querySelectorAll(".s-cell");
-  const n = arr.length;
+  let n = arr.length;
   let step = Math.floor(Math.sqrt(n));
   let prev = 0;
 
-  // Jump through blocks
   while (arr[Math.min(step, n) - 1] < target) {
-    incrementComparisons();
-
-    // Highlight jump block
     for (let i = prev; i < Math.min(step, n); i++) {
-      cells[i].classList.add("fade");
+      colorBar(bars[i], "red");
     }
+    updateComparisons();
+    await sleep(speed);
 
     prev = step;
     step += Math.floor(Math.sqrt(n));
-    await sleep(speed);
-
-    if (prev >= n) return false;
-  }
-
-  // Linear search in block
-  for (let i = prev; i < Math.min(step, n); i++) {
-    incrementComparisons();
-    cells[i].classList.add("current");
-    await sleep(speed);
-
-    if (arr[i] === target) {
-      cells[i].classList.remove("current");
-      cells[i].classList.add("done");
-      return true;
+    if (prev >= n) {
+      addResultCard("Jump Search", `${target} not found`);
+      return;
     }
-
-    cells[i].classList.remove("current");
-    cells[i].classList.add("fade");
+    resetBars(bars);
   }
 
-  return false;
+  for (let i = prev; i < Math.min(step, n); i++) {
+    colorBar(bars[i], "orange");
+    updateComparisons();
+    await sleep(speed);
+    if (arr[i] === target) {
+      colorBar(bars[i], "green");
+      addResultCard("Jump Search", `Found ${target} at index ${i}`);
+      return;
+    }
+    resetBars(bars);
+  }
+  addResultCard("Jump Search", `${target} not found`);
+}
+
+// ===== Exponential Search =====
+async function exponentialSearch(bars, target, speed) {
+  let arr = Array.from(bars).map(b => parseInt(b.textContent));
+  arr.sort((a, b) => a - b);
+  renderArray(arr);
+  bars = document.querySelectorAll(".bar");
+
+  if (arr[0] === target) {
+    colorBar(bars[0], "green");
+    addResultCard("Exponential Search", `Found ${target} at index 0`);
+    return;
+  }
+
+  let i = 1;
+  while (i < arr.length && arr[i] <= target) {
+    colorBar(bars[i], "red");
+    updateComparisons();
+    await sleep(speed);
+    i *= 2;
+  }
+
+  // Binary Search in range [i/2, min(i, arr.length)]
+  let low = Math.floor(i / 2), high = Math.min(i, arr.length - 1);
+  while (low <= high) {
+    let mid = Math.floor((low + high) / 2);
+    colorBar(bars[mid], "orange");
+    updateComparisons();
+    await sleep(speed);
+
+    if (arr[mid] === target) {
+      colorBar(bars[mid], "green");
+      addResultCard("Exponential Search", `Found ${target} at index ${mid}`);
+      return;
+    } else if (arr[mid] < target) {
+      low = mid + 1;
+    } else {
+      high = mid - 1;
+    }
+    resetBars(bars);
+  }
+
+  addResultCard("Exponential Search", `${target} not found`);
 }

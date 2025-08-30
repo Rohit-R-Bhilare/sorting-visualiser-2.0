@@ -1,235 +1,176 @@
-// ===== Theme Toggle =====
-const toggleBtn = document.getElementById("themeToggle");
-toggleBtn.addEventListener("click", () => {
-  document.body.classList.toggle("light");
-  document.body.classList.toggle("dark");
-
-  toggleBtn.textContent = document.body.classList.contains("light") ? "☀️" : "🌙";
-  localStorage.setItem(
-    "theme",
-    document.body.classList.contains("light") ? "light" : "dark"
-  );
-});
-
-// Load saved theme preference
-window.onload = () => {
-  const theme = localStorage.getItem("theme") || "dark";
-  document.body.classList.add(theme);
-  toggleBtn.textContent = theme === "light" ? "☀️" : "🌙";
-};
-
-// ===== DOM Elements =====
-const dashboardCards = document.querySelectorAll(".algo-card");
-const optionsPanel = document.getElementById("optionsPanel");
-const arrayContainer = document.querySelector(".array");
-
-// Metrics
-const comparisonsEl = document.getElementById("comparisons");
-const swapsEl = document.getElementById("swaps");
-const recCallsEl = document.getElementById("recCalls");
-const timeTakenEl = document.getElementById("timeTaken");
-
 // ===== Global State =====
-let currentAlgo = null;
-let speed = 3;
-let size = 20;
+let selectedCategory = null;
+let selectedAlgorithm = null;
+let speed = 300;
+let arraySize = 20;
 let targetValue = null;
-let selectedRecursion = "factorial";
+let numberInput = null;
+let comparisons = 0, swaps = 0, recursiveCalls = 0, steps = 0;
 
-// ===== Reset Metrics =====
+// ===== Metrics Reset & Update =====
 function resetMetrics() {
-  comparisonsEl.textContent = "0";
-  swapsEl.textContent = "0";
-  recCallsEl.textContent = "0";
-  timeTakenEl.textContent = "0";
+  comparisons = 0; swaps = 0; recursiveCalls = 0; steps = 0;
+  document.getElementById("comparisons").textContent = 0;
+  document.getElementById("swaps").textContent = 0;
+  document.getElementById("recursive-calls").textContent = 0;
+  document.getElementById("steps").textContent = 0;
 }
 
-// ===== Generate Array =====
-function generateArray(size) {
-  arrayContainer.innerHTML = "";
-  const arr = [];
-  for (let i = 0; i < size; i++) {
-    arr.push(Math.floor(Math.random() * 90) + 10);
-  }
+function incrementComparisons() {
+  comparisons++;
+  document.getElementById("comparisons").textContent = comparisons;
+}
+function incrementSwaps() {
+  swaps++;
+  document.getElementById("swaps").textContent = swaps;
+}
+function incrementRecursiveCalls() {
+  recursiveCalls++;
+  document.getElementById("recursive-calls").textContent = recursiveCalls;
+}
+function incrementSteps() {
+  steps++;
+  document.getElementById("steps").textContent = steps;
+}
+
+// ===== Utility =====
+function generateRandomArray(size = 20, maxVal = 100) {
+  return Array.from({ length: size }, () => Math.floor(Math.random() * maxVal) + 1);
+}
+function renderArray(arr) {
+  const container = document.getElementById("bars-container");
+  container.innerHTML = "";
   arr.forEach(val => {
     const bar = document.createElement("div");
-    bar.classList.add("cell");
-    bar.style.height = `${val * 2}px`;
+    bar.className = "bar";
+    bar.style.height = `${val * 3}px`;
+    bar.style.width = `${Math.max(10, 600/arr.length)}px`;
     bar.textContent = val;
-    arrayContainer.appendChild(bar);
+    container.appendChild(bar);
   });
 }
 
-// ===== Dashboard Clicks =====
-dashboardCards.forEach(card => {
+// ===== Dashboard Selection =====
+document.querySelectorAll(".algo-card").forEach(card => {
   card.addEventListener("click", () => {
-    currentAlgo = card.dataset.type;
-    renderOptions(currentAlgo);
+    selectedCategory = card.dataset.category;
+    document.getElementById("dashboard").classList.add("hidden");
+    document.getElementById("controls-section").classList.remove("hidden");
+    document.getElementById("algo-title").textContent = `${card.textContent} Controls`;
+    buildControls(selectedCategory);
   });
 });
 
-// ===== Render Options Based on Algo =====
-function renderOptions(type) {
-  optionsPanel.innerHTML = "";
+// ===== Build Dynamic Controls =====
+function buildControls(category) {
+  const controls = document.getElementById("controls");
+  controls.innerHTML = "";
+
+  if (category === "sorting" || category === "searching") {
+    // Array size
+    let sizeInput = document.createElement("input");
+    sizeInput.type = "number";
+    sizeInput.value = arraySize;
+    sizeInput.min = 5; sizeInput.max = 100;
+    sizeInput.onchange = e => arraySize = parseInt(e.target.value);
+    controls.appendChild(labelWrap("Array Size", sizeInput));
+
+    // Speed
+    let speedInput = document.createElement("input");
+    speedInput.type = "range"; speedInput.min = 50; speedInput.max = 1000;
+    speedInput.value = speed;
+    speedInput.oninput = e => speed = parseInt(e.target.value);
+    controls.appendChild(labelWrap("Speed", speedInput));
+
+    if (category === "searching") {
+      let target = document.createElement("input");
+      target.type = "number";
+      target.placeholder = "Target Value";
+      target.onchange = e => targetValue = parseInt(e.target.value);
+      controls.appendChild(labelWrap("Target", target));
+    }
+  }
+  else if (category === "recursion") {
+    let num = document.createElement("input");
+    num.type = "number";
+    num.placeholder = "Enter Number";
+    num.onchange = e => numberInput = parseInt(e.target.value);
+    controls.appendChild(labelWrap("Number", num));
+  }
+  else if (category === "dp") {
+    // Example control for DP string input
+    let str1 = document.createElement("input");
+    str1.placeholder = "String 1";
+    let str2 = document.createElement("input");
+    str2.placeholder = "String 2";
+    controls.appendChild(labelWrap("DP Input 1", str1));
+    controls.appendChild(labelWrap("DP Input 2", str2));
+  }
+  else {
+    // For graph/advanced: placeholder
+    let msg = document.createElement("p");
+    msg.textContent = "Controls will appear here.";
+    controls.appendChild(msg);
+  }
+}
+
+// Helper wrapper
+function labelWrap(label, element) {
+  let div = document.createElement("div");
+  let span = document.createElement("span");
+  span.textContent = label + ": ";
+  div.appendChild(span);
+  div.appendChild(element);
+  return div;
+}
+
+// ===== Buttons =====
+document.getElementById("start-btn").addEventListener("click", () => {
   resetMetrics();
-  arrayContainer.innerHTML = "";
+  document.getElementById("results-cards").innerHTML = "";
+  document.getElementById("recursion-steps").innerHTML = "";
+  document.getElementById("bars-container").innerHTML = "";
+  document.getElementById("dp-grid").innerHTML = "";
 
-  if (type === "sorting") {
-    optionsPanel.innerHTML = `
-      <label>Size: <input id="sizeInput" type="number" value="20" min="5" max="100"></label>
-      <label>Speed: <input id="speedInput" type="range" min="1" max="5" value="3"></label>
-      <select id="sortSelect">
-        <option value="bubble">Bubble Sort</option>
-        <option value="selection">Selection Sort</option>
-        <option value="insertion">Insertion Sort</option>
-        <option value="quick">Quick Sort</option>
-        <option value="merge">Merge Sort</option>
-        <option value="heap">Heap Sort</option>
-      </select>
-      <button id="startBtn">Start</button>
-      <button id="resetBtn">Reset</button>
-    `;
-    addSortingListeners();
+  if (selectedCategory === "sorting") {
+    let arr = generateRandomArray(arraySize);
+    renderArray(arr);
+    let bars = document.querySelectorAll(".bar");
+    bubbleSort(bars, speed); // default algo, could add selector for user
   }
-
-  if (type === "searching") {
-    optionsPanel.innerHTML = `
-      <label>Size: <input id="sizeInput" type="number" value="15" min="5" max="30"></label>
-      <label>Speed: <input id="speedInput" type="range" min="1" max="5" value="3"></label>
-      <label>Target: <input id="targetInput" type="number" placeholder="Enter value"></label>
-      <select id="searchSelect">
-        <option value="linear">Linear Search</option>
-        <option value="binary">Binary Search</option>
-        <option value="jump">Jump Search</option>
-      </select>
-      <button id="startBtn">Start</button>
-      <button id="resetBtn">Reset</button>
-    `;
-    addSearchingListeners();
-  }
-
-  if (type === "recursion") {
-    optionsPanel.innerHTML = `
-      <label>Number: <input id="numInput" type="number" value="5" min="1" max="12"></label>
-      <select id="recSelect">
-        <option value="factorial">Factorial</option>
-        <option value="fibonacci">Fibonacci</option>
-      </select>
-      <button id="startBtn">Start</button>
-      <button id="resetBtn">Reset</button>
-    `;
-    addRecursionListeners();
-  }
-}
-
-// ===== Sorting Listeners =====
-function addSortingListeners() {
-  document.getElementById("sizeInput").addEventListener("change", e => {
-    size = e.target.value;
-    generateArray(size);
-  });
-  document.getElementById("speedInput").addEventListener("input", e => {
-    speed = e.target.value;
-  });
-
-  generateArray(size);
-
-  document.getElementById("startBtn").addEventListener("click", async () => {
-    resetMetrics();
-    const algo = document.getElementById("sortSelect").value;
-    const bars = document.querySelectorAll(".cell");
-    const startTime = performance.now();
-
-    if (algo === "bubble") await bubbleSort(bars, speed);
-    if (algo === "selection") await selectionSort(bars, speed);
-    if (algo === "insertion") await insertionSort(bars, speed);
-    if (algo === "quick") await quickSort(bars, 0, bars.length - 1, speed);
-    if (algo === "merge") await mergeSort(bars, 0, bars.length - 1, speed);
-    if (algo === "heap") await heapSort(bars, speed);
-
-    const endTime = performance.now();
-    timeTakenEl.textContent = Math.round(endTime - startTime);
-  });
-
-  document.getElementById("resetBtn").addEventListener("click", () => {
-    resetMetrics();
-    generateArray(size);
-  });
-}
-
-// ===== Searching Listeners =====
-function addSearchingListeners() {
-  document.getElementById("sizeInput").addEventListener("change", e => {
-    size = e.target.value;
-    generateSearchArray(size);
-  });
-  document.getElementById("speedInput").addEventListener("input", e => {
-    speed = e.target.value;
-  });
-
-  generateSearchArray(size);
-
-  document.getElementById("startBtn").addEventListener("click", async () => {
-    resetMetrics();
-    targetValue = parseInt(document.getElementById("targetInput").value);
-    const algo = document.getElementById("searchSelect").value;
-    const cells = document.querySelectorAll(".s-cell");
-    const arr = Array.from(cells).map(c => parseInt(c.textContent));
-
-    const startTime = performance.now();
-
-    if (algo === "linear") await linearSearch(arr, targetValue, speed);
-    if (algo === "binary") await binarySearch(arr, targetValue, speed);
-    if (algo === "jump") await jumpSearch(arr, targetValue, speed);
-
-    const endTime = performance.now();
-    timeTakenEl.textContent = Math.round(endTime - startTime);
-  });
-
-  document.getElementById("resetBtn").addEventListener("click", () => {
-    resetMetrics();
-    generateSearchArray(size);
-  });
-}
-
-// ===== Recursion Listeners =====
-function addRecursionListeners() {
-  document.getElementById("startBtn").addEventListener("click", async () => {
-    resetMetrics();
-    arrayContainer.innerHTML = "";
-    const num = parseInt(document.getElementById("numInput").value);
-    const type = document.getElementById("recSelect").value;
-
-    const startTime = performance.now();
-    if (type === "factorial") {
-      await factorialVisualizer(num);
+  else if (selectedCategory === "searching") {
+    let arr = generateRandomArray(arraySize);
+    renderArray(arr);
+    let bars = document.querySelectorAll(".bar");
+    if (targetValue !== null) {
+      linearSearch(bars, targetValue, speed); // default search
     }
-    if (type === "fibonacci") {
-      await fibonacciVisualizer(num);
-    }
-    const endTime = performance.now();
-    timeTakenEl.textContent = Math.round(endTime - startTime);
-  });
-
-  document.getElementById("resetBtn").addEventListener("click", () => {
-    resetMetrics();
-    arrayContainer.innerHTML = "";
-  });
-}
-
-// ===== Generate Search Array =====
-function generateSearchArray(size) {
-  arrayContainer.innerHTML = "";
-  const arr = [];
-  let start = 5;
-  for (let i = 0; i < size; i++) {
-    arr.push(start);
-    start += Math.floor(Math.random() * 5) + 1; // increasing values
   }
-  arr.forEach(val => {
-    const cell = document.createElement("div");
-    cell.classList.add("s-cell");
-    cell.textContent = val;
-    arrayContainer.appendChild(cell);
-  });
-}
+  else if (selectedCategory === "recursion") {
+    if (numberInput !== null) {
+      factorialVisual(numberInput); // default recursion
+    }
+  }
+  else if (selectedCategory === "dp") {
+    // Example run DP LCS with dummy strings
+    let s1 = "abcde", s2 = "ace";
+    runLCS(s1, s2, document.getElementById("dp-grid"), speed);
+  }
+});
+
+document.getElementById("reset-btn").addEventListener("click", () => {
+  resetMetrics();
+  document.getElementById("bars-container").innerHTML = "";
+  document.getElementById("dp-grid").innerHTML = "";
+  document.getElementById("recursion-steps").innerHTML = "";
+  document.getElementById("results-cards").innerHTML = "";
+  selectedCategory = null;
+  selectedAlgorithm = null;
+  document.getElementById("controls-section").classList.add("hidden");
+  document.getElementById("dashboard").classList.remove("hidden");
+});
+
+// ===== Dark / Light Mode =====
+document.getElementById("theme-toggle").addEventListener("click", () => {
+  document.body.classList.toggle("dark");
+});
