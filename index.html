@@ -3,70 +3,166 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Algorithm Visualizer</title>
+  <title>Algo Visualizer — Core Modules</title>
+  <link rel="icon" href="favicon.ico" />
+  <!-- Optional: include your stylesheet if you have it -->
   <link rel="stylesheet" href="./css/style.css" />
+  <style>
+    /* Minimal safety styles in case style.css isn't present */
+    :root { --bg:#0f172a; --panel:#111827; --text:#e5e7eb; --muted:#9ca3af; --brand:#6366f1; --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444; }
+    body { margin:0; font-family:Inter,system-ui,Arial; background:var(--bg); color:var(--text); }
+    .container { max-width:1200px; margin:0 auto; padding:20px; }
+    header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }
+    .title { font-weight:700; letter-spacing:.5px; }
+    .subtitle { color:var(--muted); font-size:.95rem; }
+    .toggle { padding:10px 14px; background:#1f2937; border:1px solid #374151; border-radius:10px; cursor:pointer; color:var(--text); }
+    .section { background:var(--panel); border:1px solid #1f2937; border-radius:16px; padding:16px; margin-bottom:16px; }
+    .cards { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+    .algo-card { background:#0b1220; border:1px solid #162036; padding:18px; border-radius:14px; cursor:pointer; transition:transform .15s ease, border-color .2s ease; }
+    .algo-card:hover { transform:translateY(-2px); border-color:#263453; }
+    .algo-card h3 { margin:0 0 6px; font-size:1.05rem; }
+    .algo-card p { margin:0; color:var(--muted); font-size:.9rem; }
+    .hidden { display:none; }
+
+    .controls-wrap { display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end; }
+    .control { display:flex; flex-direction:column; gap:6px; min-width:160px; }
+    .control label { font-size:.85rem; color:var(--muted); }
+    .control input, .control select { padding:10px 12px; border-radius:10px; border:1px solid #22304c; background:#0b1220; color:var(--text); }
+    .btn { padding:12px 16px; border-radius:12px; border:1px solid #263453; background:#0b1220; color:#e5e7eb; cursor:pointer; }
+    .btn.primary { background:linear-gradient(135deg,#4f46e5,#7c3aed); border:none; }
+    .btn.danger { background:#111827; border:1px solid #3f2a2a; }
+    .btn:disabled { opacity:.6; cursor:not-allowed; }
+
+    .layout { display:grid; grid-template-columns: 1.5fr 1fr; gap:16px; }
+    .viz { background:#0b1220; border:1px solid #162036; border-radius:16px; padding:16px; min-height:320px; }
+    .bars-container { display:flex; align-items:flex-end; gap:6px; height:260px; padding:8px; border-radius:12px; background:#0a0f1a; border:1px dashed #1b2742; overflow:hidden; }
+    .bar { width:20px; background:#334155; border-radius:6px 6px 0 0; display:flex; align-items:flex-end; justify-content:center; font-size:10px; color:#cbd5e1; padding-bottom:4px; transition:height .2s ease, transform .2s ease; }
+    .bar.red { background:var(--bad); }
+    .bar.orange { background:var(--warn); }
+    .bar.green { background:var(--ok); }
+
+    .dp-grid { display:grid; grid-auto-rows:36px; gap:4px; background:#0a0f1a; border:1px dashed #1b2742; padding:8px; border-radius:12px; overflow:auto; }
+    .matrix-row { display:grid; grid-template-columns:repeat(20, 42px); gap:4px; }
+    .matrix-cell { display:flex; align-items:center; justify-content:center; border:1px solid #1f2a46; border-radius:10px; font-size:.85rem; background:#0f172a; color:#cbd5e1; min-width:42px; }
+    .matrix-cell-hi { outline:2px solid #7c3aed; }
+
+    .stack { display:flex; flex-wrap:wrap; gap:10px; }
+    .rec-card { background:#0f172a; border:1px solid #1f2a46; border-radius:12px; padding:10px 12px; min-width:160px; transition:transform .2s ease; }
+    .rec-card.done { outline:2px solid #22c55e55; transform:scale(1.02); }
+
+    .metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+    .metric { background:#0b1220; border:1px solid #162036; border-radius:14px; padding:12px; text-align:center; }
+    .metric .label { color:#9ca3af; font-size:.8rem; }
+    .metric .value { font-size:1.4rem; font-weight:700; }
+
+    @media (max-width: 1024px) { .cards { grid-template-columns:repeat(2,1fr); } .layout { grid-template-columns:1fr; } }
+    @media (max-width: 640px)  { .cards { grid-template-columns:1fr; } .controls-wrap { flex-direction:column; align-items:stretch; } }
+    body.light { --bg:#f8fafc; --panel:#ffffff; --text:#0b1220; --muted:#475569; }
+  </style>
 </head>
-<body>
-  <!-- Header -->
-  <header class="header">
-    <h1>🚀 Algorithm Visualizer</h1>
-    <button id="theme-toggle" class="btn">🌙 Dark / ☀️ Light</button>
-  </header>
+<body class="dark">
+  <div class="container">
+    <header>
+      <div>
+        <div class="title">Algorithm Visualizer — Core</div>
+        <div class="subtitle">Sorting • Searching • Recursion • Divide & Conquer • Greedy • DP</div>
+      </div>
+      <button id="theme-toggle" class="toggle">🌙 Theme</button>
+    </header>
 
-  <!-- Dashboard (Categories as big clickable cards) -->
-  <section id="dashboard" class="dashboard">
-    <h2>Select an Algorithm Category</h2>
-    <div class="card-grid">
-      <div class="algo-card" data-category="sorting">Sorting Algorithms</div>
-      <div class="algo-card" data-category="searching">Searching Algorithms</div>
-      <div class="algo-card" data-category="recursion">Recursion & Backtracking</div>
-      <div class="algo-card" data-category="divide-conquer">Divide & Conquer</div>
-      <div class="algo-card" data-category="greedy">Greedy Algorithms</div>
-      <div class="algo-card" data-category="dp">Dynamic Programming (DP)</div>
-      <div class="algo-card" data-category="graph">Graph Algorithms</div>
-      <div class="algo-card" data-category="string">String Algorithms</div>
-      <div class="algo-card" data-category="math">Mathematical Algorithms</div>
-      <div class="algo-card" data-category="advanced">Advanced Topics</div>
-    </div>
-  </section>
+    <!-- Dashboard: Category Cards -->
+    <section id="dashboard" class="section">
+      <div class="cards">
+        <div class="algo-card" data-category="sorting">
+          <h3>Sorting</h3>
+          <p>Bubble, Insertion, Selection, Merge, Quick, Heap, Counting, Radix</p>
+        </div>
+        <div class="algo-card" data-category="searching">
+          <h3>Searching</h3>
+          <p>Linear, Binary, Jump, Exponential</p>
+        </div>
+        <div class="algo-card" data-category="recursion">
+          <h3>Recursion & Backtracking</h3>
+          <p>Factorial, Fibonacci, Hanoi, N-Queens, Rat in a Maze</p>
+        </div>
+        <div class="algo-card" data-category="divide">
+          <h3>Divide & Conquer</h3>
+          <p>Binary Search, Merge Sort, Quick Sort, Strassen, Karatsuba</p>
+        </div>
+        <div class="algo-card" data-category="greedy">
+          <h3>Greedy</h3>
+          <p>Kruskal, Prim, Dijkstra, Huffman, Activity, Knapsack</p>
+        </div>
+        <div class="algo-card" data-category="dp">
+          <h3>Dynamic Programming</h3>
+          <p>LCS, LIS, Matrix Chain, Knapsack, Edit Distance, Bellman-Ford, Floyd-Warshall</p>
+        </div>
+      </div>
+    </section>
 
-  <!-- Algorithm Controls (Dynamic per choice) -->
-  <section id="controls-section" class="hidden">
-    <h2 id="algo-title">Algorithm Controls</h2>
-    <div id="controls"></div>
-    <div class="controls-buttons">
-      <button id="start-btn" class="btn primary">▶ Start</button>
-      <button id="reset-btn" class="btn">🔄 Reset</button>
-    </div>
-  </section>
+    <!-- Controls Panel -->
+    <section id="controls-section" class="section hidden">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+        <h3 id="algo-title" style="margin:0;">Controls</h3>
+        <div style="display:flex; gap:8px;">
+          <button id="start-btn" class="btn primary">Start</button>
+          <button id="reset-btn" class="btn">Reset</button>
+        </div>
+      </div>
+      <div id="controls" class="controls-wrap">
+        <!-- Dynamic controls injected by app.js -->
+      </div>
+    </section>
 
-  <!-- Visualization Section -->
-  <section id="visualization">
-    <h2>Visualization</h2>
-    <div id="bars-container" class="bars-container"></div>
-    <div id="dp-grid" class="dp-grid"></div>
-    <div id="recursion-steps" class="recursion-steps"></div>
-    <canvas id="graph-canvas"></canvas>
-  </section>
+    <!-- Main Layout: Visualization + Metrics -->
+    <section class="layout">
+      <div class="viz">
+        <h4 style="margin:0 0 10px;">Visualization</h4>
 
-  <!-- Statistics Panel -->
-  <section id="metrics-panel">
-    <h2>📊 Statistics</h2>
-    <div class="metrics-grid">
-      <div class="metric-card"><span>Comparisons</span><p id="comparisons">0</p></div>
-      <div class="metric-card"><span>Swaps</span><p id="swaps">0</p></div>
-      <div class="metric-card"><span>Recursive Calls</span><p id="recursive-calls">0</p></div>
-      <div class="metric-card"><span>Steps</span><p id="steps">0</p></div>
-    </div>
-  </section>
+        <!-- Bars for Sorting / Searching -->
+        <div id="bars-container" class="bars-container"></div>
 
-  <!-- Results Cards (for recursion/DP outputs) -->
-  <section id="results-section">
-    <h2>Results & Steps</h2>
-    <div id="results-cards" class="results-cards"></div>
-  </section>
+        <!-- DP Grid -->
+        <div id="dp-grid" class="dp-grid" style="margin-top:12px;"></div>
 
-  <!-- Scripts -->
+        <!-- Recursion Stack / Steps -->
+        <div style="margin-top:12px;">
+          <div style="font-weight:600; margin-bottom:8px;">Recursion Trace</div>
+          <div id="recursion-steps" class="stack"></div>
+        </div>
+
+        <!-- Result Cards -->
+        <div style="margin-top:12px;">
+          <div style="font-weight:600; margin-bottom:8px;">Results</div>
+          <div id="results-cards" class="stack"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h4 style="margin:0 0 10px;">Metrics</h4>
+        <div class="metrics">
+          <div class="metric">
+            <div class="label">Comparisons</div>
+            <div id="comparisons" class="value">0</div>
+          </div>
+          <div class="metric">
+            <div class="label">Swaps / Writes</div>
+            <div id="swaps" class="value">0</div>
+          </div>
+          <div class="metric">
+            <div class="label">Recursive Calls</div>
+            <div id="recursive-calls" class="value">0</div>
+          </div>
+          <div class="metric">
+            <div class="label">Steps</div>
+            <div id="steps" class="value">0</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Scripts (only the ones you asked to include) -->
   <script src="./scripts/helper.js"></script>
   <script src="./scripts/sort-algorithms.js"></script>
   <script src="./scripts/search-algorithms.js"></script>
@@ -74,10 +170,6 @@
   <script src="./scripts/divide-conquer.js"></script>
   <script src="./scripts/greedy-algorithms.js"></script>
   <script src="./scripts/dp-algorithms.js"></script>
-  <!-- <script src="./scripts/graph-algorithms.js"></script>
-  <script src="./scripts/string-algorithms.js"></script>
-  <script src="./scripts/math-algorithms.js"></script>
-  <script src="./scripts/advanced-algorithms.js"></script> -->
   <script src="./scripts/app.js"></script>
 </body>
 </html>
